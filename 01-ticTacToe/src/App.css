@@ -1,0 +1,58 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  color-scheme: dark light;
+}
+
+body {
+  display: grid;
+  place-content: center;
+  grid-template-rows: 1fr;
+  height: 100vh;
+  min-width: 1080px;
+  text-align: center;
+}
+
+.square {
+  width: 100px;
+  height: 100px;
+  background-color: #222;
+  border-radius: 20px;
+  border: 1px solid #fff;
+  font-size: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #ffe;
+  padding: 4px;
+}
+
+.square-is-selected {
+  background: #09f;
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 24px;
+  gap: 8px;
+}
+
+.board-turns {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+}
