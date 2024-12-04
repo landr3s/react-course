@@ -2,10 +2,19 @@ import { useState } from 'react'
 import { TURNS, WINNER_COMBOS } from './consts'
 import { Square } from './components/Square'
 import './App.css'
+import { WinnerModal } from './components/WinnerModal'
+import { resetGameFromStorage, saveGameToStorage } from './logic/storage'
 
 export default function App() {
-  const [board, setBoard] = useState(Array(9).fill(null))
-  const [turn, setTurn] = useState(TURNS.X)
+  const [board, setBoard] = useState(() => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    if (boardFromStorage) return JSON.parse(boardFromStorage)
+    return Array(9).fill(null)
+  })
+  const [turn, setTurn] = useState(() => {
+    const turnFromStorage = window.localStorage.getItem('turn')
+    return turnFromStorage ?? TURNS.X
+  })
   const [winner, setWinner] = useState(null)
 
   const checkWinner = boardToCheck => {
@@ -21,6 +30,10 @@ export default function App() {
     }
     return null
   }
+
+  const checkEndGame = boarToCheck =>
+    boarToCheck.every(square => square !== null)
+
   const updateBoard = index => {
     if (board[index] || winner) return
     const newBoard = [...board]
@@ -28,15 +41,20 @@ export default function App() {
     setBoard(newBoard)
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
     setTurn(newTurn)
+    saveGameToStorage({ board: newBoard, turn: newTurn })
     const newWinner = checkWinner(newBoard)
     if (newWinner) {
       setWinner(newWinner)
+    } else if (checkEndGame(newBoard)) {
+      setWinner(false) // draw
     }
   }
 
   const resetBoard = () => {
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
+    setWinner(null)
+    resetGameFromStorage()
   }
 
   return (
@@ -52,7 +70,7 @@ export default function App() {
               key={index}
               updateBoard={() => updateBoard(index)}
             >
-              {board[index]}
+              {value}
             </Square>
           )
         })}
@@ -61,13 +79,11 @@ export default function App() {
         {<Square isSelected={turn === TURNS.X}>{TURNS.X}</Square>}
         {<Square isSelected={turn === TURNS.O}>{TURNS.O}</Square>}
       </section>
-      {winner ? (
-        <section className='board-modal'>
-          <button>Play Again</button>
-        </section>
-      ) : (
-        ''
-      )}
+      <WinnerModal
+        resetGame={resetBoard}
+        winner={winner}
+        turn={turn}
+      />
     </>
   )
 }
